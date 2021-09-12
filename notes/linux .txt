@@ -1,0 +1,382 @@
+<command> -options args
+
+-short form (can be chained irrespective of order) e.g -abcdfkeif
+--long form (doesnt support for all)
+some commands like <find> are exceptions
+
+[] optional
+<> mandatory
+
+
+->open terminal
+ctrl + alt + t
+
+
+->close terminal
+ctrl + d  
+
+
+->clear terminal 
+ctrl + l
+tput clear
+
+
+->adding users
+<sudo> <adduser> username
+
+
+->display Linux processes
+<top>
+<ps> aux
+
+
+->killing processes
+<kill> PID 					--> kills a particular process
+<pgrep> processname  		--> returns all PIDs of that process
+<killall> processname 		--> closes all instances of a program running
+
+
+->file type
+<file> filename
+
+
+->terminal tab location
+<tty>
+
+
+->path of all commands
+<echo> $PATH
+
+
+->path of a single command
+<which> commandname
+
+
+-> clear history
+<history> -c; <history> -w
+
+
+->access nth command in history
+!n
+
+
+->help for any command
+help <command>
+	or
+<command> --help
+
+
+->counting words of a file
+<wc> file 				--> prints linecount, wordcount and bytes
+<wc> -l filename 		--> -l counts lines
+
+
+
+stdio:
+std input -------->					--------> std output
+						command 		
+cmd args  -------->					--------> std error  
+
+
+
+redirection:
+<command> -options args [0|1|2]> destination
+
+0 standard input  ---> keybord    			e.g cat [0]< input.txt
+1 standard output ---> terminal screen      e.g cat [1]> output.txt
+2 standard error  ---> terminal screen   	e.g cat -invalidfjsjg 2> error.txt
+e.g: echo "Hello second terminal" > /dev/pts/1   (tty)
+e.g: xargs echo < Desktop/input.txt
+e.g: cat &> output.txt 						--> redirects both stdout and stderr
+e.g: echo "hello world" > /dev/null 		--> redirects stdout nowhere
+
+<  >        overwrites
+<<  >>      appends
+
+
+
+
+piping:
+stdo of one command ---> stdi of other command
+commandOne -options args | commandTwo -options args
+
+1. <tee> filename ---> acts as T-joint
+e.g: <date> | <tee> fulldate.txt | <cut> --delimiter=" " --field=1 >> today.txt
+	creates fulldate.txt file and then pipe through cut command to create today.txt
+
+e.g: <date> | <tee> fulldate.txt >> anotherfulldate.txt
+
+--------------- redirection breaks pipeling; cant do further piping ---------------
+
+2. <xargs> command 		--> commands that only accept args and dont accept stdi
+e.g: <date> | <echo> 	--> nothing as echo only accepts commandline args 
+e.g: <date> | <xargs> <echo> ["txt"] | ...
+e.g: <cat> filesToDelete.txt | <xargs> <rm> 
+
+
+
+
+alias:
+.bash_aliases
+alias aliasName="command1 -options args | command2 -options agrs | ..."
+
+
+
+
+regular_expressions:
+*  --> anything (regardless of length)		e.g rm *.txt
+[] --> options (1 place only) 				e.g rm file[0-9].txt
+?  --> placeholder (1 place only)			e.g rm file?.txt
+
+
+
+
+brace_expansion:
+{ } --> can be used with any command
+e.g <mkdir> {0..9}_{a..z}_{jan,feb}
+
+
+
+
+->Linux Manual
+<man> command
+use <help> if <man> doesnt work
+
+----Manual structure---- 
+section 1: User commands
+section 5: File formats and Conventions
+section 8: System administration tools and Daemons
+
+
+
+
+->make directory
+<mkdir> [path/]name_of_directory
+<mkdir> -p path/name_of_directory --> creates path if it doesnt exist
+
+
+
+
+->make files
+<touch> filename{0..9}
+<mkdir> haystack/folder{1..500}
+<touch> haystack/folder{1..500}/file{1..100}
+<touch> haystack/folder$(shuf -i 1-500 -n 1)/needle.txt
+
+
+
+
+->remove files and directories
+<rm> filename[0-9] 		--> removes files
+<rm> -r foldername 		--> removes folder   (remove recursively)
+<rm> -ri foldername 	--> remove recursively with interaction
+<rmdir> foldername		--> remove empty directories
+
+
+
+
+->copy files and folders
+<cp> source... destination 			--> copy multiplefiles
+<cp> -r source/... destination/ 	--> copy multiplefolders recursively
+
+
+
+
+->moving and renaming files and folders
+<mv> oldfilename newfilename 						--> rename files
+<mv> oldfoldername/ newfoldername/ 					--> rename folders
+<mv> source... destination							--> moves files and folders
+<mv> ~/Downloads/newfolder/ ./renamednewfolder		--> moves and renames at the same time
+
+
+
+
+->editing file
+ ^ 		--> ctrl
+ M- 	--> alt
+<nano> abc.txt 				--> creates a new file, if it doesnt exist
+<sudo> <nano> /etc/nanorc	--> configration file
+uncomment <aspell> to activate spell checker 
+
+
+
+
+->locating files
+<locate> files anywhere in the system
+<locate> filename
+<locate> -S 				--> location of database
+<locate> --existing			--> existing files only
+<locate> -i 				--> ignore case-sensitive check
+<locate> --limit 10			--> limits the search 
+
+<locate> --existing --follow --> minimizes the search error but updating db is better option.
+files are stored in database and database is updated once a day, to see the recent changes update the database by:
+<sudo> <updatedb> 
+
+
+
+
+->finding both files and folders
+unlike <locate> doesnt use database, it directly uses the file system which is always up-to-date but slower.
+
+<find> 	  --> by default finds all files and folders from current directory to infinite depth.
+<find> /  --> finds all files and folders starting from root folder.
+<find> -maxdepth 2			--> current + 1 level down.
+<find> -type <f|d>			--> f is file, d is directory.
+<find> -name "filename" 	--> finds a particular file.
+<find> -iname "filename" 	--> case insensitive.
+<find> -size <+|->100k		--> + is gt, - is lt, k is KB
+
+e.g <find> ./Desktop/ -maxdepth 2 -type d | <grep> Linux | <less>
+e.g <find> / -type f -size +100k -size -5M | <wc> -l 	--> gt 100KB and lt 5MB
+e.g <find> / -type f -size -100k -o -size +5M | <wc> -l 	--> lt 100KB or gt 5MB
+e.g <sudo> <find> / -maxdepth 3 -type f -size +1M -size -5M <-exec|-ok> <cp> {} ~/folder \;
+e.g <find> haystack/ -name needle.txt -exec mv {} ~/Desktop/ \;
+
+
+
+
+->reading and concatinating files
+<cat> file1 file2... 
+<cat> file 			--> reads file normally
+<tac> file 			--> reads file from bottom to top (reverses vertically)
+<rev> file 			--> reads file in reversed fashion (horizontally)
+<less> file     	--> better option to read files than cat
+<head> [-n 5] file  --> reads first n lines (10 by default)
+<tail> [-n 5] file  --> reads last n lines (10 by default)
+
+
+
+
+->sorting  
+<sort> filename 		--> normal sort  (a-z, 0-9)
+<sort> -r filename 		--> reverse sort
+<sort> filename | tac 	--> also reverse sort
+<sort> -n filename 		--> sort by numeric values 
+<sort> -u filename 		--> unique value sort
+for tabular data -k (Keydef) option is used
+<sort> -k 5nr 			--> reverse sort by column 5 numerically
+<sort> -k 6Mh 			--> sorts data by column 6 as per month (human readable)
+
+e.g: ls -lh /etc | head -n 20 | sort -k 5nr
+
+
+
+
+->searching
+<grep> WordOrLetter filename... 	--> searches WordOrLetter in filename
+<grep> -ic abc xyz.txt 				--> i is case insensitive, c is linecount
+<grep> -v abc xyz.txt 				--> searches everything except abc (invert)
+<pgrep>	processsname				--> returns process ids (PIDs)
+
+e.g <pgrep> firefox 
+e.g <ls> /etc/ | <grep> conf
+
+
+
+
+->archiving and compression
+<zip> zipfilename.zip file1 file2...
+
+1. make a tarball (tarballs are containers which can be compressed)
+2. compress tarball using some compression algorithm
+gzip 	--> faster; less compression power
+bzip2 	--> slower; more compression power
+xz 
+
+<tar> -cvf archivename.tar file1 file2... 	--> create, verbose(feedback), accept_files
+<tar> -tf archivename.tar 		--> test label; shows what's inside
+<tar> -xvf archivename.tar		--> extract, verbose, accept_files (necessary)
+
+<gzip> archivename.tar 			--> compression is inplace 
+<gunzip> archivename.tar.gz 	--> unzip compressed files
+
+<bzip2> archivename.tar 			--> compression is inplace 
+<bunzip2> archivename.tar.bz2 		--> unzip compressed files
+
+<tar> -<z|j>cvf abc.tar.gz file1...	 --> z is gzip, j is bzip2, J is xz
+<tar> -<z|j>xvf abc.tar.bz2 		 --> extraction
+
+
+
+
+->Bourne Again Shell (bash) scripting
+#!/bin/bash 		--> shabang (which bash)
+<bash> scriptname   --> runs bash script
+<mkdir> ~/bin 		--> folder for bash scripts
+<chmod> +x file 	--> changes permission to executable  
+<nano> .bashrc 		--> add this line at the end: PATH="$PATH:$HOME/bin"
+
+<crontab> -e 			 	--> edit crontab
+<nano> .selected_editor 	--> hidden file
+
+minutes	 hours    day       month           week         command
+(0-59)	(0-23)	(1-31)	(1-12|JAN-DEC)	(0-6|SUN-SAT)	<command>
+
+crontab.guru
+* 			--> all values
+15,30,45 	--> multiple options
+*/5 		--> e.g in minutes column it means every 5 minutes
+
+e.g: 53 23 * * FRI bash ~/bin/bashscriptname 	--> runs script every Fri at 23:53
+
+
+
+->sys info
+<uname> -a    --> all
+<uname> -o    --> operating system
+<uname> -m    --> machine 
+
+
+->codename for distribution
+<lsb_release> -a
+
+
+
+->software repository
+library of softwares
+1. main 		2. universe 	--> free and open source
+3. restricted 	4. multiverse	--> proprietary and may be open source
+
+
+
+->package mangaer
+manages all package relationships
+<apt> 						--> Advanced Packaging Tool
+<apt>-cache search docx 	--> gives list of softwares packeages available
+<apt>-cache show packagename 			--> gives all info about the package
+<apt>-cache files 						--> /var/lib/apt/lists
+<sudo> <apt>-get update 	--> updates the cache that stores the lists of packages
+<sudo> <apt>-get upgrade 	--> updates every software on system as per cache
+<sudo> <apt>-get install packagename 	--> installs the package
+
+<sudo> <nano> /etc/apt/sources.list --> conf file used by apt; uncomment to download source codes
+<sudo> <apt>-get update 
+<sudo> <apt>-get install dpkg-dev
+<sudo> <apt>-get source packagename 
+
+<sudo> <apt>-get remove packagename 	--> removes package only;  not recommended
+<sudo> <apt>-get purge packagename 		--> removes package along with its conf files
+<sudo> <apt>-get autoremove --> automatically removes all dependencies that are no longer in use
+/var/cache/apt/archives 	--> stores archive copy of installed packages
+<sudo> <apt>-get clean 		--> cleans unnecessary archives
+<sudo> <apt>-get autoclean 	--> deletes which can no longer be downloaded from repositories 
+
+
+sudo apt update        # Fetches the list of available updates
+sudo apt upgrade       # Installs some updates; does not remove packages
+sudo apt full-upgrade  # Installs updates; may also remove some packages, if needed
+sudo apt autoremove
+
+
+gcc -S filename.cpp	----> filename.s
+gcc filename.s		----> a.out
+
+sudo su		----> root
+su izan		----> back to user account
+
+scrcpy
+scrcpy --record filename.mp4
+
+
+

@@ -1,0 +1,13 @@
+Layer Type	  Feature Map	Size	    Kernel Size	    Stride	    Activation
+Image               1	    227×227	    –	            –	        –
+Convolution	        96	    55×55   	11×11	        4           ReLU
+Max Pooling	        96	    27×27   	3×3	            2	        –
+Convolution	        256	    27×27   	5×5	            1           ReLU
+Max Pooling	        256	    13×13   	3×3	            2           –
+Convolution	        384	    13×13   	3×3	            1           ReLU
+Convulution	        384	    13×13   	3×3	            1           ReLU
+Convulution	        256	    13×13   	3×3	            1           ReLU
+Max Pooling	        256	    6×6	        3×3	            2           –                   
+Fully Connected	    –	    4096	    –	            –           ReLU
+Fully Connected	    –	    4096	    –	            –           ReLU
+Fully Connected	    –	    1000	    –	            –           Softmax
